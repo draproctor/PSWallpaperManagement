@@ -1,6 +1,7 @@
 C:\Users\Austin Proctor\Projects\PSWallpaperManagement\bin\Release\PSWallpaperManagement.dll
 C:\Users\Austin Proctor\Projects\PSWallpaperManagement\bin\Release\PSWallpaperManagement.pdb
 C:\Users\Austin Proctor\Projects\PSWallpaperManagement\bin\Release\System.Management.Automation.dll
+C:\Users\Austin Proctor\Projects\PSWallpaperManagement\obj\Release\PSWallpaperManagement.csprojAssemblyReference.cache
 C:\Users\Austin Proctor\Projects\PSWallpaperManagement\obj\Release\PSWallpaperManagement.csproj.CoreCompileInputs.cache
 C:\Users\Austin Proctor\Projects\PSWallpaperManagement\obj\Release\PSWallpaperManagement.csproj.CopyComplete
 C:\Users\Austin Proctor\Projects\PSWallpaperManagement\obj\Release\PSWallpaperManagement.dll

@@ -12,26 +12,31 @@ namespace PSWallpaperManagement
         public const string Fall = "Fall";
         public const string Winter = "Winter";
         public static string[] AllSeasons = { Spring, Summer, Winter, Fall };
+
+        public static string GetCurrentSeason()
+        {
+            int month = DateTime.Now.Month;
+            if (month == 3 || month == 4 || month == 5)
+                return Spring;
+            else if (month == 6 || month == 7 || month == 8)
+                return Summer;
+            else if (month == 9 || month == 10 || month == 11)
+                return Fall;
+            else
+                return Winter;
+        }
     }
 
     [Cmdlet(VerbsCommon.Get, "Season")]
     public class GetSeasonCommand : PSCmdlet
     {
-        private string _season { get; set; }
+        private string _season;
 
         protected override void BeginProcessing()
         {
             base.BeginProcessing();
 
-            int month = DateTime.Now.Month;
-            if (month == 3 || month == 4 || month == 5)
-                _season = Season.Spring;
-            else if (month == 6 || month == 7 || month == 8)
-                _season = Season.Summer;
-            else if (month == 9 || month == 10 || month == 11)
-                _season = Season.Fall;
-            else
-                _season = Season.Winter;
+            _season = Season.GetCurrentSeason();
             WriteVerbose($"Current season: {_season}");
         }
 
@@ -45,16 +50,23 @@ namespace PSWallpaperManagement
     [Cmdlet(VerbsCommon.New, "WallpaperFolder")]
     public class NewWallpaperFolderCommand : PSCmdlet
     {
+        private string _picPath;
+
+        protected override void BeginProcessing()
+        {
+            base.BeginProcessing();
+            _picPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+        }
+
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
 
-            string picPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-            WriteVerbose($"Attempting to create directory at '{picPath}'");
-            _ = Directory.CreateDirectory(picPath);
+            WriteVerbose($"Attempting to create directory at '{_picPath}'");
+            _ = Directory.CreateDirectory(_picPath);
             foreach (string season in Season.AllSeasons)
             {
-                string seasonPath = Path.Combine(picPath, season);
+                string seasonPath = Path.Combine(_picPath, season);
                 WriteVerbose($"Attempting to create directory at '{seasonPath}'");
                 WriteObject(Directory.CreateDirectory(seasonPath));
             }
@@ -64,6 +76,8 @@ namespace PSWallpaperManagement
     [Cmdlet(VerbsCommon.Get, "RandomWallpaper")]
     public class GetRandomWallpaperCommand : PSCmdlet
     {
+        private Random _rand;
+
         [Parameter(
             Mandatory = true,
             ValueFromPipeline = true,
@@ -71,13 +85,20 @@ namespace PSWallpaperManagement
         )]
         public string Path { get; set; }
 
+        protected override void BeginProcessing()
+        {
+            base.BeginProcessing();
+
+            _rand = new Random();
+        }
+
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
             if (Directory.Exists(Path))
             {
                 string[] files = Directory.GetFiles(Path);
-                int randomIndex = new Random().Next(files.Length);
+                int randomIndex = _rand.Next(files.Length);
                 WriteObject(files[randomIndex]);
             }
         }
@@ -97,9 +118,10 @@ namespace PSWallpaperManagement
 
         private void SetWallpaper(string path)
         {
-            SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, path,
-                SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+            _ = SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, path,
+                    SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
         }
+
         // End mystery code.
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
