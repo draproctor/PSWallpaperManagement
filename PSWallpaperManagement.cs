@@ -107,10 +107,28 @@ namespace PSWallpaperManagement
     [Cmdlet(VerbsCommon.Set, "Wallpaper")]
     public class SetWallpaperCommand : PSCmdlet
     {
-        // I don't know what this does but it works.
+        /// <summary>
+        /// Retrieves or sets the value of one of the system-wide parameters.
+        /// This function can also update the user profile while setting a parameter.
+        /// </summary>
+        /// <param name="uiAction">
+        /// The system-wide parameter to be retrieved or set.
+        /// </param>
+        /// <param name="uiParam">
+        /// A parameter whose usage and format depends on the system parameter being queried or set.
+        /// </param>
+        /// <param name="pvParam">
+        /// A parameter whose usage and format depends on the system parameter being queried or set.
+        /// </param>
+        /// <param name="fWinIni">
+        /// If a system parameter is being set, specifies whether the user profile is to be updated,
+        /// and if so, whether the WM_SETTINGCHANGE message is to be broadcast to all top-level 
+        /// windows to notify them of the change.
+        /// </param>
+        /// <returns></returns>
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern int SystemParametersInfo(
-            uint action, uint uParam, string vParam, uint winIni);
+            uint uiAction, uint uiParam, string pvParam, uint fWinIni);
 
         private static readonly uint SPI_SETDESKWALLPAPER = 0x14;
         private static readonly uint SPIF_UPDATEINIFILE = 0x01;
@@ -121,8 +139,6 @@ namespace PSWallpaperManagement
             _ = SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, path,
                     SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
         }
-
-        // End mystery code.
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public string Path { get; set; }
